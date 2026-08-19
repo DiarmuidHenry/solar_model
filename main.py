@@ -1,6 +1,7 @@
 from pathlib import Path
 from src.pvgis import get_hourly_pv
 from src.solar import combine_arrays, analyse_generation
+from src.charts import plot_monthly_generation
 
 # Property and roof details
 
@@ -62,13 +63,17 @@ solar = combine_arrays(
     east,
     west
 )
+solar.to_csv(
+    RAW_DATA_FOLDER / "combined_hourly.csv",
+    index=False
+)
 
 # Analyse generation
 annual_generation, monthly_generation, daily_generation = analyse_generation(solar)
 
-solar.to_csv(
-    RAW_DATA_FOLDER / "combined_hourly.csv",
-    index=False
+# Plot charts
+plot_monthly_generation(
+    monthly_generation
 )
 
 # Print results
