@@ -5,10 +5,10 @@ from src.pvgis import get_hourly_pv
 
 LATITUDE = 54.208555
 LONGITUDE = -8.515080
-ROOF_TILT = 30
+ROOF_TILT = 30    # degrees
 EAST_FACING_PANELS = 9
 WEST_FACING_PANELS = 13
-PANEL_WATTAGE = 450
+PANEL_WATTAGE = 0.450    # kW
 
 # East-facing panels
 # Power in kW
@@ -16,12 +16,12 @@ EAST_POWER =  EAST_FACING_PANELS * PANEL_WATTAGE
 # East roof orientation (between +-180)
 EAST_ASPECT = -78            
 
-
 # West-facing panels
 # Power in kW
 WEST_POWER =  WEST_FACING_PANELS * PANEL_WATTAGE
 # West roof orientation (between +-180)
-WEST_ASPECT = 102 
+WEST_ASPECT = 108
+
 
 # Output folders
 RAW_DATA_FOLDER = Path("data/raw")
