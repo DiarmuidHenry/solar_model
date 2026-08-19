@@ -1,5 +1,6 @@
 from pathlib import Path
 from src.pvgis import get_hourly_pv
+from src.solar import combine_arrays
 
 # Property and roof details
 
@@ -12,7 +13,7 @@ PANEL_WATTAGE = 0.450    # kW
 
 # East-facing panels
 # Power in kW
-EAST_POWER =  EAST_FACING_PANELS * PANEL_WATTAGE
+EAST_POWER = EAST_FACING_PANELS * PANEL_WATTAGE
 # East roof orientation (between +-180)
 EAST_ASPECT = -78            
 
@@ -58,9 +59,23 @@ west.to_csv(
     index=False
 )
 
+# Combine East and West data
+
+solar = combine_arrays(
+    east,
+    west
+)
+
+solar.to_csv(
+    RAW_DATA_FOLDER / "combined_hourly.csv",
+    index=False
+)
+
 # Print results
 print("\nDownload complete!")
 print("\nEast data:")
 print(east.head())
 print("\nWest data:")
 print(west.head())
+print("\nCombined data:")
+print(solar.head())
