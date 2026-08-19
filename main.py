@@ -1,6 +1,6 @@
 from pathlib import Path
 from src.pvgis import get_hourly_pv
-from src.solar import combine_arrays
+from src.solar import combine_arrays, analyse_generation
 
 # Property and roof details
 
@@ -39,7 +39,6 @@ east = get_hourly_pv(
     aspect=EAST_ASPECT,
     angle=ROOF_TILT,
 )
-
 east.to_csv(
     RAW_DATA_FOLDER / "east_hourly.csv",
     index=False
@@ -53,18 +52,19 @@ west = get_hourly_pv(
     aspect=WEST_ASPECT,
     angle=ROOF_TILT,
 )
-
 west.to_csv(
     RAW_DATA_FOLDER / "west_hourly.csv",
     index=False
 )
 
 # Combine East and West data
-
 solar = combine_arrays(
     east,
     west
 )
+
+# Analyse generation
+annual_generation = analyse_generation(solar)
 
 solar.to_csv(
     RAW_DATA_FOLDER / "combined_hourly.csv",
@@ -73,9 +73,11 @@ solar.to_csv(
 
 # Print results
 print("\nDownload complete!")
-print("\nEast data:")
-print(east.head())
-print("\nWest data:")
-print(west.head())
+# print("\nEast data:")
+# print(east.head())
+# print("\nWest data:")
+# print(west.head())
 print("\nCombined data:")
 print(solar.head())
+print("\nAnnual generation:")
+print(annual_generation.round(3))
