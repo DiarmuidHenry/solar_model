@@ -63,7 +63,7 @@ def get_hourly_pv(
     response = requests.get(
         PVGIS_URL,
         params=params,
-        timeout=60,
+        timeout=30,
     )
 
     response.raise_for_status()
