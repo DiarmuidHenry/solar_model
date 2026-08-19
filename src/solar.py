@@ -30,6 +30,7 @@ def analyse_generation(solar):
     solar["year"] = solar["time"].dt.year
     solar["month"] = solar["time"].dt.month
     solar["month_name"] = solar["time"].dt.month_name()
+    solar["date"] = solar["time"].dt.date
     
     # Annual generation
     annual_generation = solar.groupby("year").agg(
@@ -46,5 +47,15 @@ def analyse_generation(solar):
         west_generation_kwh=("west_generation_kwh", "sum"),
         total_generation_kwh=("total_generation_kwh", "sum")
     )
+    
+    # Daily generation
+    daily_generation = solar.groupby(
+        "date"
+    ).agg(
+        east_generation_kwh=("east_generation_kwh", "sum"),
+        west_generation_kwh=("west_generation_kwh", "sum"),
+        total_generation_kwh=("total_generation_kwh", "sum")
+    )
+    
 
-    return annual_generation, monthly_generation
+    return annual_generation, monthly_generation, daily_generation

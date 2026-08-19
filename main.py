@@ -64,7 +64,7 @@ solar = combine_arrays(
 )
 
 # Analyse generation
-annual_generation, monthly_generation = analyse_generation(solar)
+annual_generation, monthly_generation, daily_generation = analyse_generation(solar)
 
 solar.to_csv(
     RAW_DATA_FOLDER / "combined_hourly.csv",
@@ -83,3 +83,5 @@ print("\nAnnual generation:")
 print(annual_generation.round(3))
 print("\nMonthly generation:")
 print(monthly_generation.round(3))
+print("\nDaily generation:")
+print(daily_generation.round(3))
