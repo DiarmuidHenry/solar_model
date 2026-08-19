@@ -4,11 +4,11 @@ import pandas as pd
 def combine_arrays(east, west):
     combined = pd.DataFrame()
     combined["time"] = east["time"]
-    combined["east_power_w"] = east["P"].round(3)
-    combined["west_power_w"] = west["P"].round(3)
+    combined["east_power_w"] = east["P"]
+    combined["west_power_w"] = west["P"]
     combined["total_power_w"] = (
         combined["east_power_w"] + combined["west_power_w"]
-    ).round(3)
+    )
     
     # Convert hourly power to energy
     combined["east_generation_kwh"] = (
@@ -28,10 +28,23 @@ def analyse_generation(solar):
     # Copy df to avoid modifying original
     solar = solar.copy()
     solar["year"] = solar["time"].dt.year
+    solar["month"] = solar["time"].dt.month
+    solar["month_name"] = solar["time"].dt.month_name()
+    
+    # Annual generation
     annual_generation = solar.groupby("year").agg(
         east_generation_kwh=("east_generation_kwh", "sum"),
         west_generation_kwh=("west_generation_kwh", "sum"),
         total_generation_kwh=("total_generation_kwh", "sum")
     )
+    
+    # Monthly generation
+    monthly_generation = solar.groupby(
+        ["year", "month", "month_name"]
+    ).agg(
+        east_generation_kwh=("east_generation_kwh", "sum"),
+        west_generation_kwh=("west_generation_kwh", "sum"),
+        total_generation_kwh=("total_generation_kwh", "sum")
+    )
 
-    return annual_generation
+    return annual_generation, monthly_generation
