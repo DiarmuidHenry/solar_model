@@ -34,6 +34,28 @@ WEST_POWER =  WEST_FACING_PANELS * PANEL_WATTAGE
 WEST_ASPECT = 108
 
 
+# Energy system specifications
+MPPT_EFFICIENCY = 0.976
+INVERTER_EFFICIENCY = 0.980
+PV_TO_BATTERY_EFFICIENCY = 0.950
+BATTERY_TO_LOAD_EFFICIENCY = 0.999
+BATTERY_SELF_DISCHARGE_EFFICIENCY = 0.999
+PVGIS_SYSTEM_LOSS = 0
+
+# Battery specifications
+BATTERY_MODULES = 4
+BATTERY_MODULE_CAPACITY_KWH = 5.12
+BATTERY_CAPACITY_KWH = (
+    BATTERY_MODULES
+    * BATTERY_MODULE_CAPACITY_KWH
+)
+BATTERY_DEPTH_OF_DISCHARGE = 0.90
+BATTERY_USABLE_CAPACITY_KWH = (
+    BATTERY_CAPACITY_KWH
+    * BATTERY_DEPTH_OF_DISCHARGE
+)
+
+
 # Output folders
 RAW_DATA_FOLDER = Path("data/raw")
 RAW_DATA_FOLDER.mkdir(
@@ -43,28 +65,30 @@ RAW_DATA_FOLDER.mkdir(
 
 # Donwload East data
 east = get_hourly_pv(
-    latitude=LATITUDE,
-    longitude=LONGITUDE,
-    peak_power=EAST_POWER,
-    aspect=EAST_ASPECT,
-    angle=ROOF_TILT,
+    latitude = LATITUDE,
+    longitude = LONGITUDE,
+    peak_power = EAST_POWER,
+    aspect = EAST_ASPECT,
+    angle = ROOF_TILT,
+    loss = PVGIS_SYSTEM_LOSS
 )
 east.to_csv(
     RAW_DATA_FOLDER / "east_hourly.csv",
-    index=False
+    index = False
 )
 
 # Donwload West data
 west = get_hourly_pv(
-    latitude=LATITUDE,
-    longitude=LONGITUDE,
-    peak_power=WEST_POWER,
-    aspect=WEST_ASPECT,
-    angle=ROOF_TILT,
+    latitude = LATITUDE,
+    longitude = LONGITUDE,
+    peak_power = WEST_POWER,
+    aspect = WEST_ASPECT,
+    angle = ROOF_TILT,
+    loss = PVGIS_SYSTEM_LOSS
 )
 west.to_csv(
     RAW_DATA_FOLDER / "west_hourly.csv",
-    index=False
+    index = False
 )
 
 # Combine East and West data

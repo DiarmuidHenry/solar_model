@@ -9,8 +9,9 @@ def get_hourly_pv(
     longitude,
     peak_power,
     aspect,
+    loss,
     angle=30,
-    start_year=2020,
+    start_year=2005,
     end_year=2023,
 ):
     """
@@ -33,6 +34,9 @@ def get_hourly_pv(
         0   = south
         -90 = east
         +90 = west
+        
+    loss : float
+        Total PVGIS system loss percentage (for estimates)
 
     angle : float
         Panel tilt in degrees
@@ -50,7 +54,7 @@ def get_hourly_pv(
         "outputformat": "json",
         "pvcalculation": 1,
         "peakpower": peak_power,
-        "loss": 14,
+        "loss": loss,
         "angle": angle,
         "aspect": aspect,
         "startyear": start_year,
