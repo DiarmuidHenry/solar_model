@@ -2,6 +2,7 @@ import pandas as pd
 
 
 def combine_arrays(east, west):
+    
     combined = pd.DataFrame()
     combined["time"] = east["time"]
     combined["east_power_w"] = east["P"]
@@ -25,6 +26,7 @@ def combine_arrays(east, west):
 
 
 def analyse_generation(solar):
+    
     # Copy df to avoid modifying original
     solar = solar.copy()
     solar["year"] = solar["time"].dt.year
@@ -57,5 +59,30 @@ def analyse_generation(solar):
         total_generation_kwh=("total_generation_kwh", "sum")
     )
     
-
     return annual_generation, monthly_generation, daily_generation
+
+
+def calculate_average_monthly_generation(
+    daily_generation,
+    monthly_generation
+):
+
+    # Copy df to avoid modifying original
+    daily_generation = daily_generation.copy()
+    daily_generation.index = pd.to_datetime(
+        daily_generation.index
+    )
+
+    year = daily_generation.index.year.rename("year")
+    month = daily_generation.index.month.rename("month")
+    month_name = daily_generation.index.month_name().rename("month_name")
+
+    average_monthly_generation = daily_generation.groupby(
+        [year, month, month_name]
+    ).mean()
+
+    average_monthly_generation["monthly_generation_kwh"] = (
+        monthly_generation["total_generation_kwh"]
+    )
+
+    return average_monthly_generation

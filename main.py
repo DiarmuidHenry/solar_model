@@ -1,7 +1,15 @@
 from pathlib import Path
 from src.pvgis import get_hourly_pv
-from src.solar import combine_arrays, analyse_generation
-from src.charts import plot_monthly_generation, plot_daily_generation, plot_specific_day_generation
+from src.solar import (
+    combine_arrays,
+    analyse_generation,
+    calculate_average_monthly_generation
+)
+from src.charts import (
+    plot_monthly_generation,
+    plot_daily_generation,
+    plot_specific_day_generation
+)
 from datetime import date
 
 
@@ -72,33 +80,51 @@ solar.to_csv(
 # Analyse generation
 annual_generation, monthly_generation, daily_generation = analyse_generation(solar)
 
+
+# Average generation per month
+average_monthly_generation = (
+    calculate_average_monthly_generation(
+        daily_generation,
+        monthly_generation
+    )
+)
+
 # # Plot monthly chart
 # plot_monthly_generation(
 #     monthly_generation
 # )
 
-# Plot daily chart
-plot_daily_generation(
-    daily_generation
-)
+# # Plot daily chart
+# plot_daily_generation(
+#     daily_generation
+# )
 
-# Plot specific day chart. Example 01/07/23
-plot_specific_day_generation(
-    solar,
-    date(2023, 7, 1)
-)
+
+# # Plot specific day chart. Example 01/07/23
+# plot_specific_day_generation(
+#     solar,
+#     date(2020, 1, 1)
+# )
 
 # Print results
 print("\nDownload complete!")
+
 # print("\nEast data:")
 # print(east.head())
 # print("\nWest data:")
 # print(west.head())
+
 print("\nCombined data:")
 print(solar.head())
+
 # print("\nAnnual generation:")
 # print(annual_generation.round(3))
+
 # print("\nMonthly generation:")
 # print(monthly_generation.round(3))
-print("\nDaily generation:")
-print(daily_generation.round(3))
+
+# print("\nDaily generation:")
+# print(daily_generation.round(3))
+
+print("\nAverage daily generation for each month:")
+print(average_monthly_generation.round(3))
