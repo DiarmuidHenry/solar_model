@@ -141,11 +141,11 @@ print("\nDownload complete!")
 print("\nCombined data:")
 print(solar.head())
 
-# print("\nAnnual generation:")
-# print(annual_generation.round(3))
+print("\nAnnual generation:")
+print(annual_generation.round(3))
 
-# print("\nMonthly generation:")
-# print(monthly_generation.round(3))
+print("\nMonthly generation:")
+print(monthly_generation.round(3))
 
 # print("\nDaily generation:")
 # print(daily_generation.round(3))
