@@ -55,3 +55,60 @@ def test_inverter_limit():
     )
 
     assert total_inverter_output <= 2.5
+    
+
+def test_solar_and_battery_share_inverter_limit():
+    result = simulate_interval(
+        datetime(2026, 6, 1, 12, 0),
+        solar_kwh=1.0,
+        load_kwh=4.0,
+        battery_soc_kwh=10.0,
+    )
+
+    total_inverter_output = (
+        result["solar_to_house_kwh"]
+        + result["battery_to_house_kwh"]
+    )
+
+    assert total_inverter_output == 2.5
+    assert result["solar_to_house_kwh"] == 1.0
+    assert result["battery_to_house_kwh"] == 1.5
+    assert result["grid_import_kwh"] == 1.5
+
+
+def test_solar_export_is_limited_by_inverter():
+    result = simulate_interval(
+        datetime(2026, 6, 1, 12, 0),
+        solar_kwh=5.0,
+        load_kwh=1.0,
+        battery_soc_kwh=10.0,
+    )
+
+    assert result["solar_to_house_kwh"] == 1.0
+    assert result["solar_to_grid_kwh"] == 1.5
+    assert result["curtailed_solar_kwh"] == 2.5
+
+
+def test_grid_import_can_exceed_inverter_limit():
+    result = simulate_interval(
+        datetime(2026, 6, 1, 12, 0),
+        solar_kwh=0.0,
+        load_kwh=6.0,
+        battery_soc_kwh=0.0,
+    )
+
+    assert result["grid_to_house_kwh"] == 6.0
+    assert result["grid_import_kwh"] == 6.0
+
+
+def test_sunday_high_load_uses_grid():
+    result = simulate_interval(
+        datetime(2026, 6, 7, 12, 0),
+        solar_kwh=0.0,
+        load_kwh=6.0,
+        battery_soc_kwh=18.432,
+    )
+
+    assert result["battery_to_house_kwh"] == 0.0
+    assert result["grid_to_house_kwh"] == 6.0
+    assert result["grid_import_kwh"] == 6.0
