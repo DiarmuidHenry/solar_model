@@ -1,6 +1,5 @@
 import pandas as pd
 from src.simulation import simulate_interval
-from src.system import BATTERY_USABLE_CAPACITY_KWH
 
 
 def run_simulation(
@@ -16,6 +15,7 @@ def run_simulation(
     # Convert timestamps
 
     pv["time"] = pd.to_datetime(pv["time"])
+
     usage["time"] = pd.to_datetime(
         usage["time"],
         format="%H:%M",
@@ -23,12 +23,11 @@ def run_simulation(
 
     # Match usage profile to each PV interval
 
-    pv["month"] = pv["time"].dt.month
-    pv["weekday"] = pv["time"].dt.weekday
-    pv["time_only"] = (
-    pv["time"]
-    .dt.floor("30min")
-    .dt.time
+    usage_lookup = (
+        usage
+        .set_index(["month", "weekday", "time"])
+        ["expected_usage_kwh"]
+        .to_dict()
     )
 
     results = []
@@ -37,35 +36,50 @@ def run_simulation(
 
     for _, row in pv.iterrows():
 
-        usage_match = usage[
-            (usage["month"] == row["month"])
-            & (usage["weekday"] == row["weekday"])
-            & (usage["time"] == row["time_only"])
-        ]
+        # PVGIS gives hourly values
+        hour_start = row["time"].floor("h")
 
-        if usage_match.empty:
-            raise ValueError(
-                f"No usage profile found for {row['time']}"
-            )
-
-        load_kwh = usage_match.iloc[0][
-            "expected_usage_kwh"
-        ]
-
-        result = simulate_interval(
-            timestamp=row["time"],
-            solar_kwh=row["total_generation_kwh"],
-            load_kwh=load_kwh,
-            battery_soc_kwh=battery_soc_kwh,
+        # Split hourly solar equally between two half-hours
+        solar_kwh = (
+            row["total_power_w"]
+            / 1000
+            * 0.5
         )
 
-        result["timestamp"] = row["time"]
-        result["solar_kwh"] = row["total_generation_kwh"]
-        result["load_kwh"] = load_kwh
+        for half_hour in [0, 30]:
 
-        results.append(result)
+            timestamp = (
+                hour_start
+                + pd.Timedelta(minutes=half_hour)
+            )
 
-        battery_soc_kwh = result["battery_soc_kwh"]
+            key = (
+                timestamp.month,
+                timestamp.weekday(),
+                timestamp.time(),
+            )
+
+            if key not in usage_lookup:
+                raise ValueError(
+                    f"No usage profile found for {timestamp}"
+                )
+
+            load_kwh = usage_lookup[key]
+
+            result = simulate_interval(
+                timestamp=timestamp,
+                solar_kwh=solar_kwh,
+                load_kwh=load_kwh,
+                battery_soc_kwh=battery_soc_kwh,
+            )
+
+            result["timestamp"] = timestamp
+            result["solar_kwh"] = solar_kwh
+            result["load_kwh"] = load_kwh
+
+            results.append(result)
+
+            battery_soc_kwh = result["battery_soc_kwh"]
 
     results = pd.DataFrame(results)
 
