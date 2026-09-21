@@ -1,6 +1,6 @@
 from datetime import datetime
-
 from src.simulation import simulate_interval
+from src.system import BATTERY_USABLE_CAPACITY_KWH
 
 
 def test_solar_covers_house():
@@ -112,3 +112,20 @@ def test_sunday_high_load_uses_grid():
     assert result["battery_to_house_kwh"] == 0.0
     assert result["grid_to_house_kwh"] == 6.0
     assert result["grid_import_kwh"] == 6.0
+    
+
+def test_simulation_runner():
+    from src.simulation_runner import run_simulation
+
+    results = run_simulation(
+        "data/raw/combined_hourly.csv",
+        "data/processed/expected_usage_profile.csv",
+        initial_battery_soc_kwh=10.0,
+    )
+
+    assert len(results) > 0
+    assert results["battery_soc_kwh"].min() >= 0
+    assert (
+        results["battery_soc_kwh"].max()
+        <= BATTERY_USABLE_CAPACITY_KWH
+    )
