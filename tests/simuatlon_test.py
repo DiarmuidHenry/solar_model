@@ -13,7 +13,7 @@ def test_solar_covers_house():
 
     assert result["solar_to_house_kwh"] == 1.0
     assert result["grid_import_kwh"] == 0.0
-    assert result["grid_export_kwh"] == 0.0
+    assert result["grid_export_kwh"] == 1.0
 
 
 def test_battery_covers_house():
